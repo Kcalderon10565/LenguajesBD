@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Películas Disponibles</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <header>
+        <nav th:replace="~{Home :: nav}"></nav>
+    </header>
+    <div class="container mt-4">
+        <div class="text-center mb-4">
+            <h1>PELICULAS DISPONIBLES</h1>
+        </div>
+
+        <div th:if="${session.tipo_usuario == 'ADMINISTRADOR'}" class="mb-4">
+            <h2>Insertar Nueva Película</h2>
+            <form th:action="@{/Cartelera/insertar}" method="post">
+                <div class="mb-3">
+                    <label for="titulo" class="form-label">Título</label>
+                    <input type="text" name="titulo" class="form-control" id="titulo" placeholder="Título" required>
+                </div>
+                <div class="mb-3">
+                    <label for="duracion" class="form-label">Duración</label>
+                    <input type="number" name="duracion" class="form-control" id="duracion" placeholder="Duración en minutos" required>
+                </div>
+                <div class="mb-3">
+                    <label for="anioEstreno" class="form-label">Año de Estreno</label>
+                    <input type="number" name="anioEstreno" class="form-control" id="anioEstreno" placeholder="Año de estreno" required>
+                </div>
+                <div class="mb-3">
+                    <label for="clasificacion" class="form-label">Clasificación</label>
+                    <input type="text" name="clasificacion" class="form-control" id="clasificacion" placeholder="Clasificación" required>
+                </div>
+                <div class="mb-3">
+                    <label for="imagen" class="form-label">Imagen</label>
+                    <input type="text" name="imagen" class="form-control" id="imagen" placeholder="URL de la imagen" required>
+                </div>
+                <button type="submit" class="btn btn-success">Insertar Película</button>
+            </form>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3" th:each="pelicula : ${datos}">
+                <div class="card mb-4">
+                    <img th:src="@{${pelicula.imagen}}" class="card-img-top" alt="Imagen de la película" style="width: 100%; height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${pelicula.titulo}"></h5>
+                        <p class="card-text product-price">Duración: <span th:text="${pelicula.duracion}"></span> minutos</p>
+                        <p class="card-text product-price">Año: <span th:text="${pelicula.anioEstreno}"></span></p>
+                        <p class="card-text product-price">Clasificación: <span th:text="${pelicula.clasificacion}"></span></p>
+
+                        <form th:action="@{/carrito/agregar}" method="post" class="d-flex justify-content-center">
+                            <input type="hidden" name="idPelicula" th:value="${pelicula.idPelicula}" />
+                            <input type="hidden" name="cantidad" value="1" />
+                            <button type="submit" class="btn btn-primary" style="background-color: #580559; border-color: #580559">Comprar Boletos</button>
+                        </form>
+
+                        <!-- Mostrar botones solo si el usuario es administrador -->
+                        <div th:if="${session.tipo_usuario == 'ADMINISTRADOR'}" class="text-center mt-3">
+                            <!-- Botón para abrir el modal de actualización -->
+                            <button type="button" class="btn btn-warning" style="background-color: #580559; border-color: #580559"
+                                    data-bs-toggle="modal" data-bs-target="#modal-${pelicula.idPelicula}">
+                                Actualizar
+                            </button>
+
+                            <!-- Modal de actualización -->
+                            <div class="modal fade" id="modal-${pelicula.idPelicula}" tabindex="-1" aria-labelledby="modalLabel-${pelicula.idPelicula}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalLabel-${pelicula.idPelicula}">Actualizar Película</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <!-- Formulario de actualización dentro del modal -->
+                                            <form th:action="@{/Cartelera/actualizar}" method="post">
+                                                <input type="hidden" name="idPelicula" th:value="${pelicula.idPelicula}" />
+                                                <div class="mb-3">
+                                                    <label for="titulo" class="form-label">Título</label>
+                                                    <input type="text" name="titulo" th:value="${pelicula.titulo}" class="form-control" id="titulo" placeholder="Título" required />
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="duracion" class="form-label">Duración</label>
+                                                    <input type="number" name="duracion" th:value="${pelicula.duracion}" class="form-control" id="duracion" placeholder="Duración" required />
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="anioEstreno" class="form-label">Año de Estreno</label>
+                                                    <input type="number" name="anioEstreno" th:value="${pelicula.anioEstreno}" class="form-control" id="anioEstreno" placeholder="Año de estreno" required />
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="clasificacion" class="form-label">Clasificación</label>
+                                                    <input type="text" name="clasificacion" th:value="${pelicula.clasificacion}" class="form-control" id="clasificacion" placeholder="Clasificación" required />
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="imagen" class="form-label">Imagen</label>
+                                                    <input type="text" name="imagen" th:value="${pelicula.imagen}" class="form-control" id="imagen" placeholder="Imagen" required />
+                                                </div>
+                                                <button type="submit" class="btn btn-primary" style="background-color: #580559; border-color: #580559">Actualizar</button>
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botón para eliminar película -->
+                            <form th:action="@{/Cartelera/eliminar}" method="post" class="d-inline">
+                                <input type="hidden" name="idPelicula" th:value="${pelicula.idPelicula}" />
+                                <button type="submit" class="btn btn-danger" style="background-color: #580559; border-color: #580559">Eliminar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer th:replace="~{Home :: footer}"></footer>
+</body>
+</html>
